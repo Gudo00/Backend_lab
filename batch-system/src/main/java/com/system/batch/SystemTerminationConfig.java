@@ -7,18 +7,18 @@ import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.infrastructure.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Import(BatchConfig.class)
+@Configuration
 public class SystemTerminationConfig {
-    private final JobRepository jobRepository;
-    private final PlatformTransactionManager transactionManager;
-
     private AtomicInteger processesKilled = new AtomicInteger(0);
     private final int TERMINATION_TARGET = 5;
+
+    private final JobRepository jobRepository;
+    private final PlatformTransactionManager transactionManager;
 
     public SystemTerminationConfig(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         this.jobRepository = jobRepository;
@@ -76,7 +76,7 @@ public class SystemTerminationConfig {
         return new StepBuilder("completeQuestStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     System.out.println("미션 완료! 좀비 프로세스 " + TERMINATION_TARGET + "개 처형 성공!");
-                    System.out.println("보상: kill -9 권한 획득, 시스템 제어 레벨 1 달성");
+                    System.out.println("시스템 제어 레벨 1 달성");
                     return RepeatStatus.FINISHED;
                 }, transactionManager)
                 .build();
